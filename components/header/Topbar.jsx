@@ -1,5 +1,4 @@
 "use client";
-import { auth } from "@/db/firebase";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -9,11 +8,17 @@ import { useAuth } from "@/hooks/useAuth";
 import { adminEmail } from "@/data/siteData";
 // import ComboboxDemo from "@/components/ComboboxDemo"; // Assuming you have ComboboxDemo component separately
 
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth, db } from "@/db/firebase"; // Ensure you import the Firestore instance
+import { doc, getDoc, setDoc } from "firebase/firestore"; // Import Firestore methods
+
 const Topbar = () => {
     const [value, setValue] = useState("");
     const { user, loading } = useAuth();
     const router = useRouter();
     const [searchValue, setSearchValue] = useState("");
+
+    const [error, setError] = useState(null);
 
     if (loading) {
         return <p>Loading...</p>; // Simple loading message or spinner
@@ -24,6 +29,37 @@ const Topbar = () => {
         router.push(`/search?type=${type}&query=${searchValue}`);
     };
 
+    const handleGoogleLogin = async () => {
+        const provider = new GoogleAuthProvider();
+
+        try {
+            const res = await signInWithPopup(auth, provider);
+            const user = res.user;
+
+            if (user) {
+                const userEmail = user.email;
+                const userDocRef = doc(db, "user", userEmail);
+
+                // Check if the document exists
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (!userDocSnap.exists()) {
+                    // If it doesn't exist, create a new document with the user's data
+                    await setDoc(userDocRef, {
+                        email: userEmail,
+                        name: user.displayName,
+                        cart: [], // Initialize cart if needed
+                        // Add other user fields as necessary
+                    });
+                }
+            }
+
+            // Redirect to the home page after login
+            router.push("/");
+        } catch (error) {
+            setError(error.message);
+        }
+    };
     return (
         <header className="w-full px-1">
             {/* Logo */}
@@ -141,13 +177,13 @@ const Topbar = () => {
                         )
                     ) : (
                         <div className="text-orange-500 hover:text-orange-600">
-                            <Link
-                                href="/login"
+                            <button
+                                onClick={handleGoogleLogin}
                                 className="flex items-center space-x-1"
                             >
                                 <LogIn />
                                 <span>Login</span>
-                            </Link>
+                            </button>
                         </div>
                     )}
                 </div>

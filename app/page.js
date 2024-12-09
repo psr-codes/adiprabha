@@ -1,8 +1,5 @@
 "use client";
-import Image from "next/image";
-import localFont from "next/font/local";
 import LandingPage from "@/components/landing/LandingPage";
-import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
 // import { getUserCart } from "@/api/cart/getUserCart";
 import { getUserCart } from "@/api/cart-wishlist/getUserCartWishlist";
@@ -29,7 +26,6 @@ export default function Home() {
                 return;
             }
             const data = await getUserCart(user.email);
-            console.log("user cart: ", data);
             data.forEach((item) => {
                 addToCart(item);
             });
@@ -39,7 +35,6 @@ export default function Home() {
     return (
         <section className="text-4xl w-[100vw] ">
             <LandingPage />
-            <ToastContainer />
         </section>
     );
 }

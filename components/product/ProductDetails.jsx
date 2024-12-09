@@ -68,8 +68,10 @@ const ProductDetails = ({ id, category }) => {
     }, [id]);
 
     const handleAddToCart = async () => {
+        console.log("please login");
         if (!user || !user.email) {
-            toast.info("Please login to add items to cart");
+            console.log("Please login to add items to cart");
+            toast.error("Please login to add items to cart");
             return;
         }
         if (!productData) return;
@@ -343,7 +345,7 @@ const ProductDetails = ({ id, category }) => {
                                 </div>
                             </div>
                             <div className="mb-4    text-sm ">
-                                <span className="text-sm md:text-base text-gray-500 ">
+                                {/* <span className="text-sm md:text-base text-gray-500 ">
                                     {productData?.product?.Shipping && (
                                         <span>
                                             Inc ₹
@@ -367,7 +369,7 @@ const ProductDetails = ({ id, category }) => {
                                         </span>
                                     )}
                                 </span>
-                                ||
+                                || */}
                                 <span className="text-sm md:text-base text-gray-500">
                                     {" "}
                                     Inclusive of all taxes
